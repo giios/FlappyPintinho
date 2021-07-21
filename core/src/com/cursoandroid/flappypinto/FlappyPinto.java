@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,6 +12,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.Random;
 
@@ -31,8 +34,8 @@ public class FlappyPinto extends ApplicationAdapter {
 	//private ShapeRenderer shape;
 
 	//Atributos de configuracao
-	private int larguraDispositivo;
-	private int alturaDispositivo;
+	private float larguraDispositivo;
+	private float alturaDispositivo;
 	private int estadoJogo=0;// 0-> jogo não iniciado 1-> jogo iniciado 2-> Tela Game Over/
 	private int pontuacao=0;
 
@@ -44,6 +47,12 @@ public class FlappyPinto extends ApplicationAdapter {
 	private float deltaTime;
 	private float alturaEntreCanosRandomica;
 	private boolean marcouPonto=false;
+
+	//camera
+	private OrthographicCamera camera;
+	private Viewport viewport;
+	private final float VIRTUAL_WIDTH = 768;
+	private final float VIRTUAL_HEIGTH = 1024;
 
 	@Override
 	public void create () {
@@ -72,11 +81,20 @@ public class FlappyPinto extends ApplicationAdapter {
 		canoTopo = new Texture("cano_topo_maior.png");
 		gameOver = new Texture("game_over.png");
 
-		larguraDispositivo = Gdx.graphics.getWidth();
-		alturaDispositivo  = Gdx.graphics.getHeight();
+		/**************
+		 * configurações da camera
+		 */
+		camera = new OrthographicCamera();
+		camera.position.set(VIRTUAL_WIDTH/2, VIRTUAL_HEIGTH/2, 0);
+		viewport = new StretchViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGTH, camera );
+
+		larguraDispositivo = VIRTUAL_WIDTH;
+		alturaDispositivo  = VIRTUAL_HEIGTH;
+
+
 		posicaoInicialVertical = alturaDispositivo / 2;
 		posicaoMovimentoCanoHorizontal = larguraDispositivo;
-		espacoEntreCanos = 300;
+		espacoEntreCanos = 200;
 
 	}
 
@@ -103,6 +121,14 @@ public class FlappyPinto extends ApplicationAdapter {
 
 			if( estadoJogo == 1 ){
 
+				//Verifica pontuação
+				if(posicaoMovimentoCanoHorizontal < 120 ){
+					if( !marcouPonto ){
+						pontuacao++;
+						marcouPonto = true;
+					}
+				}
+
 				//movimento dos canos
 				posicaoMovimentoCanoHorizontal -= deltaTime * 200;
 
@@ -114,17 +140,11 @@ public class FlappyPinto extends ApplicationAdapter {
 				//Verifica se o cano saiu inteiramente da tela
 				if (posicaoMovimentoCanoHorizontal < -canoTopo.getWidth()) {
 					posicaoMovimentoCanoHorizontal = larguraDispositivo;
-					alturaEntreCanosRandomica = numeroRandomico.nextInt(400) - 200;
+					alturaEntreCanosRandomica = numeroRandomico.nextInt(600) - 200;
 					marcouPonto = false;
 				}
 
-				//Verifica pontuação
-				if(posicaoMovimentoCanoHorizontal < 120 ){
-					if( !marcouPonto ){
-						pontuacao++;
-						marcouPonto = true;
-					}
-				}
+
 
 			}else{//Tela game over -> 2
 
@@ -141,6 +161,9 @@ public class FlappyPinto extends ApplicationAdapter {
 			}
 
 		}
+
+		//configurar dados de projeção da camera
+		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
 
@@ -185,5 +208,10 @@ public class FlappyPinto extends ApplicationAdapter {
 			estadoJogo = 2;
 		}
 
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		viewport.update(width, height);
 	}
 }

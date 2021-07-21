@@ -33,7 +33,7 @@ public class FlappyPinto extends ApplicationAdapter {
 	//Atributos de configuracao
 	private int larguraDispositivo;
 	private int alturaDispositivo;
-	private int estadoJogo=0;// 0-> jogo não iniciado 1-> jogo iniciado 2-> Tela Game Over
+	private int estadoJogo=0;// 0-> jogo não iniciado 1-> jogo iniciado 2-> Tela Game Over/
 	private int pontuacao=0;
 
 	private float variacao = 0;
@@ -68,8 +68,8 @@ public class FlappyPinto extends ApplicationAdapter {
 		pinto[2] = new Texture("passaro3.png");
 
 		fundo = new Texture("fundo.png");
-		canoBaixo = new Texture("cano_baixo.png");
-		canoTopo = new Texture("cano_topo.png");
+		canoBaixo = new Texture("cano_baixo_maior.png");
+		canoTopo = new Texture("cano_topo_maior.png");
 		gameOver = new Texture("game_over.png");
 
 		larguraDispositivo = Gdx.graphics.getWidth();
